@@ -13,17 +13,15 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     portaudio19-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Playwright browser dependencies
-RUN playwright install-deps chromium
-
 WORKDIR /app
 
 # Copy requirements first for better caching
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Install Playwright browsers
-RUN playwright install chromium
+# Install the Chromium browser and its OS deps (needs the playwright CLI from pip above)
+RUN playwright install --with-deps chromium \
+    && rm -rf /var/lib/apt/lists/*
 
 # Copy the rest of the application
 COPY . .
